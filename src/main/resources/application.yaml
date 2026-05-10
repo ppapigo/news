@@ -1,0 +1,31 @@
+server:
+  port: 8091
+
+spring:
+  application:
+    name: news
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/news?useSSL=false&serverTimezone=Asia/Seoul&allowPubliclyRetrieval=true
+    username: root
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        show_sql: true
+
+
+news-api:
+  api-Key: bf60dc7bffe643da9e41ebd0f94b8703
+  base-url: https://newsapi.org/v2/top-headlines
+  source-url: https://newsapi.org/v2/top-headlines/sources
+  country: us
+  default-category: business
