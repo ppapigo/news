@@ -1,6 +1,7 @@
 package com.example.news.entity;
 
 
+import com.example.news.dto.CategoryDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -36,5 +37,13 @@ public class Category {
         Category category = new Category();
         category.setName(name);
         return category;
+    }
+
+    public static CategoryDTO toDTO(Category category){
+        CategoryDTO dto =new CategoryDTO();
+        dto.setId(category.getId());
+        dto.setName(category.getName());
+
+        return dto;
     }
 }

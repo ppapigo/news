@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}">Title</title>
+    <link th:href="@{/css/news.css}" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>News Service</h1>
+        <p>World Wide News By Category</p>
+    </header>
+
+    <nav class="tabs" th:if="${not #lists.isEmpty(categories)}">
+        <a th:each="c : ${categories}"
+            th:href="@{/news(category=${c.name})}"
+           th:class="tab"
+           th:classappend="${c.name == selected} ? 'active': ''"
+           th:text="${c.name}"
+        >link
+        </a>
+
+    </nav>
+
+    <div class="grid" th:if="${not #lists.isEmpty(articles)}">
+      <div class="card" th:each="a : ${articles}">
+          <img th:src="${a.urlToImage}">
+
+          <a th:href="${a.url}" target="_blank">
+            <p th:text="${a.title}"></p>
+          </a>
+          <p th:text="${a.author}"></p>
+          <p th:text="${a.description}"></p>
+          <p th:text="${a.source.name}"></p>
+          <p th:text="${a.publishedAt}"></p>
+
+      </div>
+  </div>
+
+</body>
+</html>

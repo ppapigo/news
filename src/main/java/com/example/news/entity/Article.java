@@ -73,4 +73,19 @@ public class Article {
 
         return article;
     }
+
+    public static ArticleDTO toDTO(Article article){
+        ArticleDTO dto = new ArticleDTO();
+        dto.setAuthor(article.getAuthor());
+        dto.setTitle(article.getTitle());
+        dto.setDescription(article.getDescription());
+        dto.setUrl(article.getUrl());
+        dto.setUrlToImage(article.getUrlToImage());
+        dto.setPublishedAt(article.getPublishedAt());
+        dto.setContent(article.getContent());
+
+        dto.setSource(Source.toDTO(article.getSource()));
+
+        return dto;
+        }
 }

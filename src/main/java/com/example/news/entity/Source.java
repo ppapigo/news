@@ -31,7 +31,7 @@ public class Source {
     private String url;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="category",foreignKey = @ForeignKey(name ="fk_source_category"))
+    @JoinColumn(name="category",foreignKey = @ForeignKey(name ="fk_category_source2"))
     private Category category;
 
     @Column(name = "language", length = 50)
@@ -41,6 +41,7 @@ public class Source {
     private String country;
 
     public static Source fromDTO(SourceDTO dto, Category category){
+        System.out.println("dto url = " + dto.getUrl());
         Source source =new Source();
         source.setName(dto.getName());
         source.setSid(dto.getId());
@@ -54,6 +55,14 @@ public class Source {
 
     }
 
+    public static SourceDTO toDTO(Source source){
+        SourceDTO dto = new SourceDTO();
+            dto.setId(source.getSid());
+            dto.setName(source.getName());
+            dto.setDescription(source.getDescription());
+            dto.setUrl(source.getUrl());
 
+            return dto;
+        }
 
 }

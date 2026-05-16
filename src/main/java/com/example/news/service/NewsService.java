@@ -45,37 +45,40 @@ public class NewsService {
             return new IngestResult("fetchTopHeadLines 호출 실패", 0, 0, 0);
         }
 
+        System.out.println(country + " " + categoryName);
+
         if(!articleResponse.getStatus().equalsIgnoreCase("ok") ||
-                articleResponse.getArticles()==null||
             articleResponse.getArticles().isEmpty()){
             System.out.println("status: " + articleResponse.getStatus());
             System.out.println("status가 ok가 아니거나 articles가 비어있음");
 
             return new IngestResult("status가 ok가 아니거나 기사 없음", 0, 0, 0);
         }
-        List<ArticleDTO> articles = articleResponse.getArticles();
-        int total =articles.size();
-        int saved = 0;
-        int skip = 0;
+
         Category category = categoryInsertOrGet(categoryName);
         if(category == null ){
             return new IngestResult("category data를 생성하거나 가져올 수 없습니다",0,0,0);
         }
-        for(ArticleDTO articleDTO:articles){
+        List<ArticleDTO> articles = articleResponse.getArticles();
+        int total =articles.size();
+        int saved = 0;
+        int skip = 0;
+        for(ArticleDTO articleDTO : articles){
 
             Source source = sourceInsertOrGet(articleDTO.getSource(), category);
-            if(source == null) {
+            if(source==null){
                 skip++;
                 continue;
             }
 
-            if(articleRepository.existsByTitle(articleDTO.getTitle())) {
+           if(articleRepository.existsByTitle(articleDTO.getTitle())){
                 skip++;
                 continue;
             }
-            Article article = Article.fromDTO(articleDTO,source,category);
+
+           Article article = Article.fromDTO(articleDTO, source, category);
+
             articleRepository.save(article);
-
             saved++;
         }
         return new IngestResult("Ingest 작업완료",total,saved,skip);

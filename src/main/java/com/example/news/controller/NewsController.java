@@ -5,8 +5,16 @@ import com.example.news.dto.ArticleResponse;
 import com.example.news.dto.SourceResponse;
 import com.example.news.service.NewsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+
+//Mvc: 통합
+//Model: 데이터를 다루는 객체
+//View: 데이터를 보여주는 객체
+//Controller: 호출을 제어하는 객체
+
+//MVP: 분리
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/news")
@@ -25,7 +33,7 @@ public class NewsController {
 
         return newsService.fetchTopHeadlines(countryName,categoryName);
     }
-    @PostMapping("/sync")
+    @PostMapping(value="/sync",produces= MediaType.APPLICATION_JSON_VALUE)
     public NewsService.IngestResult ingestTopHeadLines(
             @RequestParam(required = false) String country,
             @RequestParam(required = false) String category
@@ -57,5 +65,10 @@ public class NewsController {
         System.out.println("sourceUrl = " + newsApiProperties.sourceUrl());
         System.out.println("apiKey = " + newsApiProperties.apiKey());
         return newsService.ingestSource(url);
+    }
+
+    @GetMapping("/health")
+    public String health(){
+        return "News Service Running...";
     }
 }
