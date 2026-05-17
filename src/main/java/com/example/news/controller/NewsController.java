@@ -1,12 +1,15 @@
 package com.example.news.controller;
 
 import com.example.news.config.NewsApiProperties;
-import com.example.news.dto.ArticleResponse;
-import com.example.news.dto.SourceResponse;
+import com.example.news.dto.*;
+import com.example.news.entity.Category;
+import com.example.news.service.ArticleService;
 import com.example.news.service.NewsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 //Mvc: 통합
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/news")
 public class NewsController {
     private final NewsService newsService;
+    private final ArticleService articleService;
     private final NewsApiProperties newsApiProperties;
 
     @GetMapping("/top-headLines")
@@ -70,5 +74,30 @@ public class NewsController {
     @GetMapping("/health")
     public String health(){
         return "News Service Running...";
+    }
+
+    @GetMapping("/")
+    public ArticleResponse news(
+            @RequestParam(required = false, name="category",defaultValue = "business") String categoryName
+    ){
+        Category category = articleService.getCategory(categoryName);
+        List<ArticleDTO> articles = articleService.getArticles(category);
+
+        ArticleResponse response =new ArticleResponse();
+        response.setStatus("ok");
+        response.setTotalResults((long) articles.size());
+        response.setArticles(articles);
+
+        return response;
+
+    }
+    @GetMapping("/categories")
+    public CategoryResponse getCategories(){
+        List<CategoryDTO> categories = articleService.getCategories();
+        CategoryResponse response = new CategoryResponse();
+        response.setResults((long)categories.size());
+        response.setCategories( categories );
+
+        return response;
     }
 }

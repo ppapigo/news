@@ -24,16 +24,29 @@
 
     <div class="grid" th:if="${not #lists.isEmpty(articles)}">
       <div class="card" th:each="a : ${articles}">
-          <img th:src="${a.urlToImage}">
+          <img class="thumb" th:src="${a.urlToImage !=null and !#strings.isEmpty(a.urlToImage)} ? ${a.urlToImage} :@{/images/news.jpg}">
 
-          <a th:href="${a.url}" target="_blank">
-            <p th:text="${a.title}"></p>
-          </a>
-          <p th:text="${a.author}"></p>
-          <p th:text="${a.description}"></p>
-          <p th:text="${a.source.name}"></p>
-          <p th:text="${a.publishedAt}"></p>
+          <div class="card-body">
+              <h2>
+                  <a th:href="${a.url}" th:text="${a.title}" target="_blank"></a>
+              </h2>
+              <p class="desc"
+                 th:if="${a.description != null and !#strings.isEmpty(a.description)}"
+                 th:text="${a.description}">기사요약</p>
 
+              <div class="meta">
+                  <span class="source"
+                  th:text="${a.source !=null} ? ${a.source.name} : '-'">발행처</span>
+
+                  <span th:text="${a.publishedAt}"></span>
+<!--                  <time th:if="${a.publishedAt !=null}"-->
+<!--                            th:datetime="${a.publishedAt}"-->
+<!--                            th:text="${#temporals.format(a.publishedAt,'yyyy-MM-dd HH:mm','Asia/Seoul')}">-->
+<!--                      2026-05-17 09:00-->
+<!--                  </time>-->
+
+              </div>
+          </div>
       </div>
   </div>
 
