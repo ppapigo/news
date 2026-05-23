@@ -24,13 +24,15 @@ public class ArticleViewController {
     @GetMapping("/news")
     public String index(
             @RequestParam(name = "category",required = false)String categoryName,
+            @RequestParam(required = false,defaultValue = "20")Integer pageSize,
+            @RequestParam(required = false,defaultValue = "1")Integer page,
             Model model
     ){
 
         Category category =(categoryName == null) ? null: articleService.getCategory(categoryName);
 
 
-        List<ArticleDTO> articles = articleService.getArticles(category);
+        List<ArticleDTO> articles = articleService.getArticles(category,pageSize,page);
         List<CategoryDTO> categories=articleService.getCategories();
 
         System.out.println("가져온 뉴스 데이터개수:"+articles.size()+"개");

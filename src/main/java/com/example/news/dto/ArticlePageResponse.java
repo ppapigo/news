@@ -4,16 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ArticleResponse {
+public class ArticlePageResponse {
     private String status;
-    private Long totalResults;
-    private Long page;
-    private List<ArticleDTO> articles;
+    private Page<ArticleDTO> articles;
 }

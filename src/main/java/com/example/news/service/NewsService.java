@@ -12,8 +12,10 @@ import com.example.news.repository.CategoryRepository;
 import com.example.news.repository.SourceRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+
 
 import java.util.List;
 
@@ -26,24 +28,35 @@ public class NewsService {
     private final CategoryRepository categoryRepository;
     private final SourceRepository sourceRepository;
 
-    public ArticleResponse fetchTopHeadlines(String country, String category) {
+    public ArticleResponse fetchTopHeadlines(String country, String category, String pageNum) {
 
-        return newsApiRestClient.get()
+        ArticleResponse response = newsApiRestClient
+                .get()
                 .uri(uriBuilder -> uriBuilder
                         .queryParam("country", country)
                         .queryParam("category", category)
+                        .queryParam("page",pageNum)
                         .build()) // query parameter 를 포함하는 url을 생성함
                 .retrieve()  //request를 호출
                 .body(ArticleResponse.class);
 
+        //total Results 출력
+        // ArticleResponse::articles의 아이템의 개수 출력
+        if(response!=null) {
+            System.out.println("totalResults: "+response.getTotalResults());
+            System.out.println("response.articles의 개수: "+response.getArticles().size());
+        }
+        return response;
+
     }
     @Transactional
-    public IngestResult ingestTopHeadLines(String country, String categoryName){
-        ArticleResponse articleResponse = fetchTopHeadlines(country, categoryName);
+    public IngestResult ingestTopHeadLines(String country, String categoryName, String page){
+        ArticleResponse articleResponse = fetchTopHeadlines(country, categoryName,page);
         if(articleResponse==null) {
             System.out.println("fetchTopHeadLInes 호출이 실패함");
             return new IngestResult("fetchTopHeadLines 호출 실패", 0, 0, 0);
         }
+
 
         System.out.println(country + " " + categoryName);
 
@@ -64,22 +77,30 @@ public class NewsService {
         int saved = 0;
         int skip = 0;
         for(ArticleDTO articleDTO : articles){
+            try {
+                if(articleDTO.getAuthor()==null || articleDTO.getAuthor().length() > 100){
+                    skip++;
+                    continue;
+                }
+                Source source = sourceInsertOrGet(articleDTO.getSource(), category);
+                if (source == null) {
+                    skip++;
+                    continue;
+                }
 
-            Source source = sourceInsertOrGet(articleDTO.getSource(), category);
-            if(source==null){
+                if (articleRepository.existsByTitle(articleDTO.getTitle())) {
+                    skip++;
+                    continue;
+                }
+
+                Article article = Article.fromDTO(articleDTO, source, category);
+
+                articleRepository.save(article);
+                saved++;
+            } catch (DataIntegrityViolationException e) {
+                System.out.println("Database System Error: "+e.getMessage());
                 skip++;
-                continue;
             }
-
-           if(articleRepository.existsByTitle(articleDTO.getTitle())){
-                skip++;
-                continue;
-            }
-
-           Article article = Article.fromDTO(articleDTO, source, category);
-
-            articleRepository.save(article);
-            saved++;
         }
         return new IngestResult("Ingest 작업완료",total,saved,skip);
     }
