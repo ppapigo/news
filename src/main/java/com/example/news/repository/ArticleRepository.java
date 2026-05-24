@@ -13,7 +13,8 @@ import java.util.List;
 public interface ArticleRepository extends JpaRepository<Article, Long> {
     Boolean existsByTitle(String title);
     
-    List<Article> findByCategoryOrderByPublishedAtDesc(Category category, Pageable pageable);
+   // List<Article> findByCategoryOrderByPublishedAtDesc(Category category, Pageable pageable);
+   Page<Article> findByCategoryOrderByPublishedAtDesc(Category category, Pageable pageable);
 
     // 완전일치
     //List<Article> findByTitle(String title);

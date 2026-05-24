@@ -7,10 +7,21 @@
 </head>
 <body>
     <header>
-        <h1>News Service</h1>
+        <a th:href="@{/news}">
+            <h1>News Service</h1>
+        </a>
+
         <p>World Wide News By Category</p>
     </header>
 
+    <form class="search-form" th:action="@{/search}" method="GET">
+        <input type="hidden" name="category" th:value="${selected ?: ''}">
+        <input class="search-input" type="text" name="q" placeholder="기사 검색..." th:value="${q ?: ''}">
+        <button type="submit" class="search-btn">검색</button>
+    </form>
+
+
+    <!--카테고리 목록 출력 -->
     <nav class="tabs" th:if="${not #lists.isEmpty(categories)}">
         <a th:each="c : ${categories}"
             th:href="@{/news(category=${c.name})}"
@@ -22,8 +33,8 @@
 
     </nav>
 
-    <div class="grid" th:if="${not #lists.isEmpty(articles)}">
-      <div class="card" th:each="a : ${articles}">
+    <div class="grid" th:if="${not #lists.isEmpty(articles.content)}">
+      <div class="card" th:each="a : ${articles.content}">
           <img class="thumb" th:src="${a.urlToImage !=null and !#strings.isEmpty(a.urlToImage)} ? ${a.urlToImage} :@{/images/news.jpg}">
 
           <div class="card-body">
@@ -49,6 +60,40 @@
           </div>
       </div>
   </div>
+
+    <!-- Pagination -->
+    <nav class="pagination" th:if="${articles.size > 0}">
+
+        <!-- 이전 -->
+        <a th:if="${!articles.first}"
+           th:href="@{/search(q=${q}, category=${selected}, page=${articles.number})}"
+           class="page-btn">&lt;</a>
+
+        <span th:if="${articles.first}" class="page-btn disabled">&lt;</span>
+
+        <!-- 페이지 번호 계산 -->
+        <th:block th:with="
+        start=${(articles.number / 10) * 10 + 1},
+        end=${(articles.totalPages > start + 9) ? start + 9 : articles.totalPages}
+    ">
+
+            <a th:each="i : ${#numbers.sequence(start, end)}"
+               th:href="@{/search(q=${q}, category=${selected}, page=${i})}"
+               class="page-btn"
+               th:classappend="${i - 1 == articles.number} ? 'active' : ''"
+               th:text="${i}">
+            </a>
+
+        </th:block>
+
+        <!-- 다음 -->
+        <a th:if="${!articles.last}"
+           th:href="@{/search(q=${q}, category=${selected}, page=${articles.number + 2})}"
+           class="page-btn">&gt;</a>
+
+        <span th:if="${articles.last}" class="page-btn disabled">&gt;</span>
+
+    </nav>
 
 </body>
 </html>

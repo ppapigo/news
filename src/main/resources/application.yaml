@@ -29,3 +29,10 @@ news-api:
   source-url: https://newsapi.org/v2/top-headlines/sources
   country: us
   default-category: business
+
+
+logging:
+  level:
+    com.example.news: DEBUG
+    org.springframework.web.client: DEBUG
+

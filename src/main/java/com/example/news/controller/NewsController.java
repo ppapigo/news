@@ -5,6 +5,8 @@ import com.example.news.dto.*;
 import com.example.news.entity.Category;
 import com.example.news.service.ArticleService;
 import com.example.news.service.NewsService;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
@@ -79,22 +81,22 @@ public class NewsController {
         return "News Service Running...";
     }
 
-    @GetMapping("/")
-    public ArticleResponse news(
+    @GetMapping
+    public ArticlePageResponse news(
             @RequestParam(required = false, name="category"/*defaultValue = "business"*/) String categoryName,
-            @RequestParam(required = false, defaultValue = "20") Integer pageSize,
-            @RequestParam(required = false, defaultValue = "1") Integer page
+            @RequestParam(required = false, defaultValue = "12")@Min(1) @Max(100) Integer pageSize,
+            @RequestParam(required = false, defaultValue = "1") @Min(1) Integer page
     ){
         Category category = null;
         if(categoryName != null) {
             category = articleService.getCategory(categoryName);
         }
-        List<ArticleDTO> articles = articleService.getArticles(category, pageSize, page);
+        Page<ArticleDTO> articles = articleService.getArticles(category, pageSize, page);
 
-        ArticleResponse response =new ArticleResponse();
+        ArticlePageResponse response =new ArticlePageResponse();
         response.setStatus("ok");
-        response.setTotalResults((long) articles.size());
-        response.setPage((long) page);
+        //response.setTotalResults((long) articles.getTotalElements());
+        //response.setPage((long) page);
         response.setArticles(articles);
 
         return response;
@@ -112,10 +114,10 @@ public class NewsController {
 
     @GetMapping("/search")
     public ArticlePageResponse search(
-            @RequestParam(name = "q")String q,
+            @RequestParam(required = false, name = "q")String q,
             @RequestParam(required = false, name="category") String categoryName,
-            @RequestParam(required = false, defaultValue="20")Integer pageSize,
-            @RequestParam(required = false, defaultValue="1")Integer page
+            @RequestParam(required = false, defaultValue="12")@Min(1) @Max(100)Integer pageSize,
+            @RequestParam(required = false, defaultValue="1")@Min(1) Integer page
 
     ){
         Page<ArticleDTO> articles = articleService.search(q,categoryName,pageSize,page);
